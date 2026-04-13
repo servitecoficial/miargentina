@@ -1,0 +1,280 @@
+/* ==========================================================================
+   NETWORK ODYSSEY - ARCHITECTURE: SENIOR UI/UX
+   ========================================================================== */
+
+:root {
+    --primary-glow: #00ff41;    /* Matrix Green */
+    --secondary-glow: #ff0055;  /* Cyber Pink */
+    --bg-dark: #050505;
+    --terminal-font: 'Share Tech Mono', monospace;
+    --pixel-font: 'Press Start 2P', cursive;
+    --glass-bg: rgba(0, 40, 0, 0.15);
+}
+
+* {
+    box-sizing: border-box;
+    cursor: crosshair; /* Detalle de gaming */
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: var(--bg-dark);
+    color: var(--primary-glow);
+    font-family: var(--terminal-font);
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* --- CAPAS DE EFECTOS VISUALES (POST-PROCESSING) --- */
+
+#vfx-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: radial-gradient(circle, rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.4) 100%);
+    pointer-events: none;
+    z-index: 1000;
+}
+
+#scanline {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%), 
+                linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+    background-size: 100% 3px, 3px 100%;
+    pointer-events: none;
+    z-index: 1001;
+}
+
+/* --- INTERFAZ DE LOGIN --- */
+
+#main-interface {
+    position: relative;
+    z-index: 10;
+    width: 90%;
+    max-width: 900px;
+}
+
+.terminal-card {
+    background: var(--glass-bg);
+    border: 2px solid var(--primary-glow);
+    padding: 40px;
+    box-shadow: 0 0 20px rgba(0, 255, 65, 0.2);
+    backdrop-filter: blur(10px);
+    clip-path: polygon(0 5%, 5% 0, 100% 0, 100% 95%, 95% 100%, 0 100%);
+}
+
+.glitch-text {
+    font-family: var(--pixel-font);
+    font-size: 2.5rem;
+    text-align: center;
+    text-transform: uppercase;
+    position: relative;
+    text-shadow: 0.05em 0 0 var(--secondary-glow), -0.05em -0.025em 0 var(--primary-glow);
+    animation: glitch 1s infinite;
+}
+
+.status-bar {
+    text-align: center;
+    font-size: 0.8rem;
+    opacity: 0.7;
+    margin-bottom: 30px;
+    letter-spacing: 2px;
+}
+
+/* --- INPUTS Y SELECCIÓN --- */
+
+.input-wrapper {
+    margin-bottom: 30px;
+}
+
+#player-name {
+    width: 100%;
+    background: rgba(0, 255, 65, 0.05);
+    border: 1px solid var(--primary-glow);
+    padding: 15px;
+    color: var(--primary-glow);
+    font-family: inherit;
+    font-size: 1.2rem;
+    outline: none;
+    transition: 0.3s;
+}
+
+#player-name:focus {
+    box-shadow: 0 0 15px var(--primary-glow);
+    background: rgba(0, 255, 65, 0.1);
+}
+
+.grid-characters {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.char-card {
+    border: 1px solid rgba(0, 255, 65, 0.3);
+    padding: 15px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.char-card:hover, .char-card.active {
+    background: var(--primary-glow);
+    color: #000;
+    transform: translateY(-5px);
+}
+
+.avatar-icon {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+}
+
+.char-info .name { display: block; font-weight: bold; }
+.char-info .stat { font-size: 0.7rem; }
+
+/* --- BOTONES --- */
+
+.btn-primary {
+    width: 100%;
+    padding: 20px;
+    background: var(--secondary-glow);
+    color: white;
+    font-family: var(--pixel-font);
+    border: none;
+    margin-top: 20px;
+    transition: 0.3s;
+    clip-path: polygon(5% 0, 100% 0, 95% 100%, 0 100%);
+}
+
+.btn-primary:hover {
+    background: white;
+    color: var(--secondary-glow);
+    box-shadow: 0 0 30px var(--secondary-glow);
+}
+
+/* --- SISTEMA DE DIÁLOGOS (PROF. ALAN) --- */
+
+#dialogue-wrapper {
+    position: absolute;
+    bottom: 30px;
+    width: 80%;
+    max-width: 800px;
+    background: rgba(0, 0, 0, 0.95);
+    border-left: 5px solid var(--secondary-glow);
+    display: flex;
+    padding: 20px;
+    z-index: 100;
+    transition: opacity 0.5s ease;
+}
+
+.ui-hidden { opacity: 0; pointer-events: none; }
+
+#alan-portrait {
+    width: 80px;
+    height: 80px;
+    background: #222; /* Aquí irá el sprite del profesor */
+    border: 2px solid var(--primary-glow);
+    margin-right: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+}
+
+#alan-portrait::before { content: "👨‍🏫"; }
+
+#speaker-id {
+    margin: 0;
+    color: var(--secondary-glow);
+    font-family: var(--pixel-font);
+    font-size: 0.8rem;
+}
+
+#text-output {
+    margin-top: 10px;
+    font-size: 1.1rem;
+    line-height: 1.4;
+}
+
+.cursor-blink {
+    animation: blink 0.8s infinite;
+}
+
+/* --- ANIMACIONES --- */
+
+@keyframes glitch {
+    0% { transform: translate(0); }
+    20% { transform: translate(-2px, 2px); }
+    40% { transform: translate(-2px, -2px); }
+    60% { transform: translate(2px, 2px); }
+    80% { transform: translate(2px, -2px); }
+    100% { transform: translate(0); }
+}
+
+@keyframes blink {
+    50% { opacity: 0; }
+}
+
+/* DISEÑO DE ALTO IMPACTO - ESTÁNDAR TRIPLE A */
+:root {
+    --neon-green: #39ff14;
+    --neon-pink: #ff007f;
+    --cyber-blue: #05d9e8;
+    --dark-void: #010101;
+}
+
+body {
+    background: var(--dark-void);
+    background-image: 
+        linear-gradient(rgba(0, 255, 20, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 255, 20, 0.05) 1px, transparent 1px);
+    background-size: 50px 50px; /* Grilla de fondo */
+    animation: grid-move 20s linear infinite;
+}
+
+@keyframes grid-move {
+    from { background-position: 0 0; }
+    to { background-position: 0 1000px; }
+}
+
+.terminal-card {
+    background: rgba(0, 0, 0, 0.9);
+    border: 1px solid var(--neon-green);
+    box-shadow: 0 0 40px rgba(57, 255, 20, 0.1), inset 0 0 20px rgba(57, 255, 20, 0.1);
+    border-radius: 0px; /* Los juegos Pro no usan bordes redondeados infantiles */
+    padding: 60px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Efecto de borde escaneado */
+.terminal-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 2px;
+    background: var(--neon-green);
+    animation: scan-line 4s linear infinite;
+}
+
+@keyframes scan-line {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+.char-card {
+    filter: grayscale(100%) brightness(0.5);
+    border: 1px dashed var(--neon-green);
+    transition: 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.char-card:hover, .char-card.active {
+    filter: grayscale(0%) brightness(1.2);
+    border: 1px solid var(--neon-green);
+    box-shadow: 0 0 25px var(--neon-green);
+    transform: scale(1.05) rotate(-1deg);
+}

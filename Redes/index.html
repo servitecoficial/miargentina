@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Network Odyssey: Central Hub</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="style.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser-arcade-physics.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+</head>
+<body>
+
+    <div id="vfx-overlay"></div>
+    <div id="scanline"></div>
+
+    <main id="main-interface">
+        <section id="login-module" class="terminal-card">
+            <header class="glitch-container">
+                <h1 class="glitch-text" data-text="NETWORK ODYSSEY">NETWORK ODYSSEY</h1>
+                <p class="status-bar">SISTEMA OPERATIVO DE REDES v2.6 // AUTORIZADO POR PROF. ALAN ACOSTA</p>
+            </header>
+
+            <div class="input-wrapper">
+                <label for="player-name">> IDENTIFICACIÓN DE ESTUDIANTE:</label>
+                <input type="text" id="player-name" placeholder="Escribe tu nombre..." spellcheck="false" autocomplete="off">
+            </div>
+
+            <div class="selector-container">
+                <h2>SELECCIONA AVATAR DE MISIÓN</h2>
+                <div class="grid-characters">
+                    <div class="char-card" data-char="scientist">
+                        <div class="avatar-icon">🔬</div>
+                        <div class="char-info">
+                            <span class="name">Científico</span>
+                            <span class="stat">LÓGICA: +10</span>
+                        </div>
+                    </div>
+                    <div class="char-card" data-char="apprentice_m">
+                        <div class="avatar-icon">👦</div>
+                        <div class="char-info">
+                            <span class="name">Aprendiz (M)</span>
+                            <span class="stat">VELOCIDAD: +10</span>
+                        </div>
+                    </div>
+                    <div class="char-card" data-char="apprentice_f">
+                        <div class="avatar-icon">👧</div>
+                        <div class="char-info">
+                            <span class="name">Aprendiz (F)</span>
+                            <span class="stat">AGUANTE: +10</span>
+                        </div>
+                    </div>
+                    <div class="char-card" data-char="robot">
+                        <div class="avatar-icon">🤖</div>
+                        <div class="char-info">
+                            <span class="name">Unit-7</span>
+                            <span class="stat">HARDWARE: +10</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button id="btn-establish-connection" class="btn-primary">
+                ESTABLECER CONEXIÓN
+            </button>
+        </section>
+    </main>
+
+    <div id="dialogue-wrapper" class="ui-hidden">
+        <div class="portrait-container">
+            <div id="alan-portrait"></div>
+        </div>
+        <div class="dialogue-body">
+            <h3 id="speaker-id">PROF. ALAN ACOSTA</h3>
+            <div id="text-output"></div>
+            <span class="cursor-blink">█</span>
+        </div>
+    </div>
+
+    <div id="game-container"></div>
+
+    <script src="script.js" type="module"></script>
+</body>
+</html>

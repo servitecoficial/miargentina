@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Poke-Web IDE Pro | Edicion Prof. Alan Acosta</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+
+    <script src="https://unpkg.com/blockly/blockly.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="screen-intro" class="screen full-screen active">
+        <div class="nes-container intro-box">
+            <h1>LABORATORIO WEB</h1>
+            <p>Profesor Alan Acosta</p>
+
+            <div class="prof-intro-avatar"></div>
+
+            <div class="dialogue-box-intro">
+                <p id="intro-text">Hola. Soy el Profesor Alan Acosta. Mente brillante, musculos de acero y codigo impecable. Para programar bien hay que entrenar duro. Cual es tu nombre, novato?</p>
+            </div>
+
+            <input type="text" id="trainer-name" placeholder="Escribe tu nombre..." maxlength="15" autocomplete="off">
+            <button id="btn-next-intro" class="nes-btn primary">Entrar al Laboratorio ></button>
+        </div>
+    </div>
+
+    <div id="screen-selection" class="screen full-screen hidden">
+        <div class="nes-container selection-box">
+            <h2>ELIGE A TU COMPANERO DE CODIGO</h2>
+            <p>Te acompanara paso a paso en tus 30 misiones web.</p>
+
+            <div class="pk-container">
+                <div class="pk-card" data-pk="charmander">
+                    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/4.png" alt="Charmander">
+                    <p>Charmander</p>
+                </div>
+                <div class="pk-card" data-pk="bulbasaur">
+                    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png" alt="Bulbasaur">
+                    <p>Bulbasaur</p>
+                </div>
+                <div class="pk-card" data-pk="squirtle">
+                    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/7.png" alt="Squirtle">
+                    <p>Squirtle</p>
+                </div>
+                <div class="pk-card" data-pk="pikachu">
+                    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png" alt="Pikachu">
+                    <p>Pikachu</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="screen-main" class="screen hidden">
+        <header>
+            <div class="header-info">
+                <span>ALUMNO: <span id="ui-trainer-name" class="highlight">???</span></span>
+                <span>EXP: <span id="ui-exp" class="highlight">0</span></span>
+            </div>
+
+            <div class="header-level-select">
+                <label for="level-selector">CLASE:</label>
+                <select id="level-selector"></select>
+                <button id="btn-eval" class="btn-evaluator">EVALUAR MISION</button>
+            </div>
+        </header>
+
+        <main class="main-layout">
+            <section id="blockly-container" aria-label="Editor de bloques">
+                <div id="blocklyDiv"></div>
+            </section>
+
+            <section id="right-panel">
+                <div id="escenario">
+                    <div class="scenario-bg"></div>
+                    <div id="pk-shadow" aria-hidden="true"></div>
+                    <img id="pk-sprite" src="" alt="Pokemon">
+
+                    <div id="dialogo-box">
+                        <div class="dialogue-avatar-mini"></div>
+                        <div class="dialogue-content">
+                            <div class="dialogue-header">Prof. Alan Acosta</div>
+                            <div class="dialogue-text">
+                                <span id="txt-mensaje"></span><span class="cursor">v</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="browser-window">
+                    <div class="browser-header">
+                        <div class="dots">
+                            <span class="dot red"></span>
+                            <span class="dot yellow"></span>
+                            <span class="dot green"></span>
+                        </div>
+                        <div class="browser-url">Tu Pagina Web | Vista previa automatica</div>
+                    </div>
+                    <iframe id="web-preview" title="Navegador Web"></iframe>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <xml id="toolbox" style="display:none">
+        <category name="Base HTML" colour="#D32F2F">
+            <block type="t_html"></block>
+            <block type="t_head"></block>
+            <block type="t_body"></block>
+            <block type="t_footer"></block>
+        </category>
+        <category name="Textos" colour="#FBC02D">
+            <block type="t_title"></block>
+            <block type="t_h1"></block>
+            <block type="t_h2"></block>
+            <block type="t_p"></block>
+            <block type="t_b"></block>
+            <block type="t_i"></block>
+        </category>
+        <category name="Elementos" colour="#4CAF50">
+            <block type="t_img"></block>
+            <block type="t_button"></block>
+            <block type="t_div"></block>
+        </category>
+        <category name="Menu (Nav)" colour="#3F51B5">
+            <block type="t_nav"></block>
+            <block type="t_ul"></block>
+            <block type="t_li"></block>
+            <block type="t_a"></block>
+        </category>
+        <category name="Formularios" colour="#FF9800">
+            <block type="t_form"></block>
+            <block type="t_input"></block>
+        </category>
+        <category name="Diseno CSS" colour="#9C27B0">
+            <block type="t_style"></block>
+            <block type="css_rule"></block>
+            <block type="css_prop"></block>
+        </category>
+    </xml>
+
+    <script src="app.js"></script>
+</body>
+</html>

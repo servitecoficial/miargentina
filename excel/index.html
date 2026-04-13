@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ExcelQuest – El Reino de los Datos</title>
+  <link rel="stylesheet" href="excel.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+<!-- ===== PANTALLA DE INICIO ===== -->
+<div id="screen-intro" class="screen active">
+  <div class="stars"></div>
+  <div class="intro-content">
+    <div class="logo-title">
+      <span class="logo-excel">EXCEL</span><span class="logo-quest">QUEST</span>
+    </div>
+    <p class="logo-sub">✦ El Reino de los Datos ✦</p>
+    <div class="professor-intro">
+      <div class="prof-sprite" id="prof-alan-big"></div>
+      <div class="speech-box intro-speech">
+        <p id="intro-text"></p>
+        <span class="cursor-blink">▮</span>
+      </div>
+    </div>
+    <button class="btn-start pixel-btn" id="btn-start-game">▶ COMENZAR AVENTURA</button>
+    <p class="press-start-hint">Presioná cualquier tecla para continuar</p>
+  </div>
+</div>
+
+<!-- ===== PANTALLA NOMBRE ===== -->
+<div id="screen-name" class="screen">
+  <div class="stars"></div>
+  <div class="name-content">
+    <div class="professor-mini">
+      <div class="prof-sprite small" id="prof-alan-small"></div>
+      <div class="speech-box">
+        <p>¡Bienvenido, joven! Soy el <strong>Profesor Alan Acosta</strong>.<br>
+        Para comenzar la aventura... ¿cuál es tu nombre, elegido?</p>
+      </div>
+    </div>
+    <div class="name-input-area">
+      <label class="pixel-label">INGRESÁ TU NOMBRE:</label>
+      <input type="text" id="player-name-input" class="pixel-input" maxlength="12" placeholder="Tu nombre aquí"/>
+    </div>
+    <button class="pixel-btn" id="btn-confirm-name">CONFIRMAR ✓</button>
+  </div>
+</div>
+
+<!-- ===== PANTALLA SELECCIÓN DE PERSONAJE ===== -->
+<div id="screen-character" class="screen">
+  <div class="stars"></div>
+  <div class="char-select-content">
+    <div class="professor-mini">
+      <div class="prof-sprite small"></div>
+      <div class="speech-box">
+        <p id="char-speech">Excelente, <span class="player-name-tag"></span>.<br>
+        El destino del reino recae sobre vos.<br>
+        ¡Elegí tu personaje, héroe!</p>
+      </div>
+    </div>
+    <h2 class="pixel-h2">– ELIGE TU PERSONAJE –</h2>
+    <div class="characters-grid">
+      <div class="char-card" data-char="chico">
+        <div class="char-sprite chico"></div>
+        <p class="char-name">GUERRERO</p>
+        <p class="char-desc">Valiente y decidido</p>
+      </div>
+      <div class="char-card" data-char="chica">
+        <div class="char-sprite chica"></div>
+        <p class="char-name">HEROÍNA</p>
+        <p class="char-desc">Ágil y lista</p>
+      </div>
+      <div class="char-card" data-char="orco">
+        <div class="char-sprite orco"></div>
+        <p class="char-name">ORCO</p>
+        <p class="char-desc">Fuerza bruta y corazón</p>
+      </div>
+      <div class="char-card" data-char="bruja">
+        <div class="char-sprite bruja"></div>
+        <p class="char-name">BRUJA</p>
+        <p class="char-desc">Sabiduría arcana</p>
+      </div>
+      <div class="char-card" data-char="brujo">
+        <div class="char-sprite brujo"></div>
+        <p class="char-name">BRUJO</p>
+        <p class="char-desc">Magia y misterio</p>
+      </div>
+    </div>
+    <button class="pixel-btn" id="btn-confirm-char" disabled>ELEGIR ESTE PERSONAJE ✓</button>
+  </div>
+</div>
+
+<!-- ===== MAPA DEL MUNDO ===== -->
+<div id="screen-map" class="screen">
+  <div class="hud">
+    <div class="hud-player">
+      <div class="hud-sprite" id="hud-char"></div>
+      <div class="hud-info">
+        <span class="hud-name" id="hud-name-display">JUGADOR</span>
+        <div class="hud-xp-bar"><div class="hud-xp-fill" id="hud-xp-fill"></div></div>
+        <span class="hud-pts" id="hud-pts">⭐ 0 pts</span>
+      </div>
+    </div>
+    <div class="hud-level">
+      <span>NIVEL</span>
+      <span id="hud-level-num" class="hud-level-num">1</span>
+    </div>
+  </div>
+  <div class="map-world">
+    <div class="map-title">✦ MAPA DEL REINO DE CALCUREA ✦</div>
+    <div class="map-container" id="map-container">
+      <!-- Zonas del mapa generadas por JS -->
+    </div>
+  </div>
+</div>
+
+<!-- ===== PANTALLA DE NIVEL (ENSEÑANZA/BATALLA) ===== -->
+<div id="screen-level" class="screen">
+  <div class="hud">
+    <div class="hud-player">
+      <div class="hud-sprite" id="hud-char2"></div>
+      <div class="hud-info">
+        <span class="hud-name" id="hud-name2">JUGADOR</span>
+        <div class="hud-xp-bar"><div class="hud-xp-fill" id="hud-xp-fill2"></div></div>
+        <span class="hud-pts" id="hud-pts2">⭐ 0 pts</span>
+      </div>
+    </div>
+    <div class="hud-level">
+      <span>NIVEL</span>
+      <span id="hud-level-num2" class="hud-level-num">1</span>
+    </div>
+  </div>
+
+  <!-- Escena de enseñanza -->
+  <div id="scene-teach" class="level-scene">
+    <div class="scene-bg" id="scene-bg"></div>
+    <div class="scene-characters">
+      <div class="scene-prof">
+        <div class="prof-sprite medium" id="scene-prof-sprite"></div>
+      </div>
+      <div class="scene-player-char">
+        <div class="player-sprite medium" id="scene-player-sprite"></div>
+      </div>
+    </div>
+    <div class="dialogue-box">
+      <div class="dialogue-name" id="dialogue-speaker">Prof. Alan Acosta</div>
+      <div class="dialogue-text" id="dialogue-text">...</div>
+      <button class="pixel-btn small" id="btn-next-dialogue">SIGUIENTE ▶</button>
+    </div>
+  </div>
+
+  <!-- Escena de batalla / ejercicio -->
+  <div id="scene-battle" class="level-scene hidden">
+    <div class="battle-header">
+      <div class="battle-title" id="battle-title">¡DESAFÍO!</div>
+      <div class="battle-enemy">
+        <div class="enemy-sprite" id="enemy-sprite"></div>
+        <div class="enemy-hp-bar"><div class="enemy-hp-fill" id="enemy-hp-fill"></div></div>
+        <span class="enemy-name" id="enemy-name">Enemigo</span>
+      </div>
+    </div>
+    <div class="battle-description" id="battle-description"></div>
+
+    <!-- Mini hoja de cálculo -->
+    <div class="spreadsheet-container" id="spreadsheet-container">
+      <div class="spreadsheet-toolbar">
+        <span class="toolbar-label">📊 ExcelQuest Sheet</span>
+        <span id="formula-bar" class="formula-bar"></span>
+      </div>
+      <div class="spreadsheet-grid" id="spreadsheet-grid"></div>
+    </div>
+
+    <!-- Quiz para niveles sin hoja -->
+    <div class="quiz-container hidden" id="quiz-container">
+      <div class="quiz-question" id="quiz-question"></div>
+      <div class="quiz-options" id="quiz-options"></div>
+    </div>
+
+    <div class="battle-actions">
+      <button class="pixel-btn battle-btn" id="btn-check-answer">⚔ ATACAR CON MI RESPUESTA</button>
+      <button class="pixel-btn battle-btn secondary" id="btn-hint">💡 PISTA (−5 pts)</button>
+    </div>
+    <div class="battle-feedback hidden" id="battle-feedback"></div>
+  </div>
+
+  <!-- Victory -->
+  <div id="scene-victory" class="level-scene hidden">
+    <div class="victory-content">
+      <div class="victory-stars" id="victory-stars"></div>
+      <div class="victory-title" id="victory-title">¡VICTORIA!</div>
+      <div class="victory-pts" id="victory-pts">+100 pts</div>
+      <div class="victory-speech">
+        <div class="prof-sprite small"></div>
+        <div class="speech-box">
+          <p id="victory-text">¡Excelente trabajo!</p>
+        </div>
+      </div>
+      <button class="pixel-btn" id="btn-back-map">🗺 VOLVER AL MAPA</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL HISTORIA ===== -->
+<div id="modal-story" class="modal hidden">
+  <div class="modal-content">
+    <div class="modal-title" id="modal-title">Historia</div>
+    <div class="modal-body" id="modal-body"></div>
+    <button class="pixel-btn" id="btn-close-modal">CONTINUAR ▶</button>
+  </div>
+</div>
+
+<script src="game.js"></script>
+</body>
+</html>
