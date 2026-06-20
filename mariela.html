@@ -220,84 +220,6 @@
 
   /* TOAST */
   #toast { position:fixed; bottom:80px; left:50%; transform:translateX(-50%); background:#333; color:#fff; padding:10px 20px; border-radius:20px; font-size:13px; font-weight:700; opacity:0; transition:opacity 0.3s; z-index:600; pointer-events:none; white-space:nowrap; }
-
-  /* ===== CUD DORSO CARD ===== */
-  .cud-card-dorso {
-    width: 100vw; height: 100vh;
-    display: flex; align-items: center; justify-content: center;
-    background: #000;
-  }
-  .cud-dorso {
-    width: min(90vw, 420px);
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-    display: flex;
-    background: #fff;
-    position: relative;
-  }
-  /* Franja celeste derecha (rotated title) */
-  .cud-dorso-right {
-    width: 54px; flex-shrink: 0;
-    background: linear-gradient(180deg, #29b5e8 0%, #0d9dd4 100%);
-    display: flex; align-items: center; justify-content: center;
-    padding: 10px 0;
-  }
-  .cud-dorso-right span {
-    writing-mode: vertical-rl;
-    transform: rotate(180deg);
-    color: #fff;
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: 0.3px;
-    text-align: center;
-    line-height: 1.2;
-  }
-  /* Contenido principal */
-  .cud-dorso-body {
-    flex: 1;
-    padding: 18px 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-  }
-  /* Sección izquierda con logos */
-  .cud-dorso-logos {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-bottom: 4px;
-  }
-  /* Fila de datos */
-  .cud-dorso-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px 12px;
-  }
-  .cud-dato-label {
-    font-size: 11px;
-    color: #888;
-    font-weight: 600;
-    margin-bottom: 2px;
-  }
-  .cud-dato-value {
-    font-size: 15px;
-    font-weight: 800;
-    color: #1a1a2e;
-  }
-  /* Logo CUD SVG */
-  .cud-logo-cud {
-    display: flex; align-items: center; gap: 8px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid #eee;
-  }
-  .cud-logo-agencia {
-    display: flex; align-items: center; gap: 8px;
-    padding-top: 4px;
-  }
-  .cud-logo-text-main { font-size: 12px; font-weight: 800; color: #1a1a2e; line-height: 1.2; }
-  .cud-logo-text-sub { font-size: 10px; font-weight: 600; color: #555; line-height: 1.3; }
-
 </style>
 </head>
 <body>
@@ -618,7 +540,7 @@
             Teléfono celular
             <span class="badge-verificar">Verificá tu número</span>
           </div>
-          <div class="perfil-field-value">+54-11-70384521</div>
+          <div class="perfil-field-value">+54-11-30984476</div>
         </div>
         <div class="perfil-edit">
           <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
@@ -631,7 +553,7 @@
     <div class="perfil-card">
       <div class="perfil-field">
         <div class="perfil-field-info">
-          <div class="perfil-field-value" style="font-size:16px;">BERNAL 1795</div>
+          <div class="perfil-field-value" style="font-size:16px;">Modesto lafuente 2065</div>
           <div style="font-size:13px;color:var(--text-mid);margin-top:3px;font-weight:600;">Merlo, Buenos Aires (1716) Argentina</div>
         </div>
         <div class="perfil-edit">
@@ -700,77 +622,7 @@
       <img src="img/flor_frente.png" alt="CUD Frente"/>
     </div>
     <div class="lb-slide">
-      <div class="cud-card-dorso">
-        <div class="cud-dorso">
-
-          <!-- Lado izquierdo: logos + datos -->
-          <div class="cud-dorso-body">
-            <!-- Logo CUD -->
-            <div class="cud-logo-cud">
-              <svg width="52" height="52" viewBox="0 0 52 52" fill="none">
-                <rect width="52" height="52" rx="8" fill="#f5f5f5"/>
-                <!-- Letra C morada -->
-                <text x="6" y="34" font-size="26" font-weight="900" fill="#5c3d8f" font-family="Arial">C</text>
-                <!-- Letra U morada -->
-                <text x="18" y="34" font-size="26" font-weight="900" fill="#5c3d8f" font-family="Arial">U</text>
-                <!-- Letra D celeste -->
-                <text x="32" y="34" font-size="26" font-weight="900" fill="#29b5e8" font-family="Arial">D</text>
-                <!-- Escudo pequeño -->
-                <ellipse cx="26" cy="42" rx="10" ry="5" fill="#29b5e8" opacity="0.3"/>
-              </svg>
-              <div>
-                <div class="cud-logo-text-main">Certificado Único<br>de Discapacidad</div>
-              </div>
-            </div>
-
-            <!-- Datos personales -->
-            <div class="cud-dorso-row">
-              <div>
-                <div class="cud-dato-label">Nombre</div>
-                <div class="cud-dato-value">Mariela</div>
-              </div>
-              <div>
-                <div class="cud-dato-label">Apellido</div>
-                <div class="cud-dato-value">Canepa</div>
-              </div>
-            </div>
-            <div class="cud-dorso-row">
-              <div>
-                <div class="cud-dato-label">Documento</div>
-                <div class="cud-dato-value">34583357</div>
-              </div>
-              <div>
-                <div class="cud-dato-label">Acompañante</div>
-                <div class="cud-dato-value">Sí</div>
-              </div>
-            </div>
-            <div class="cud-dorso-row">
-              <div>
-                <div class="cud-dato-label">Fecha de Nacimiento</div>
-                <div class="cud-dato-value">12/08/1988</div>
-              </div>
-            </div>
-
-            <!-- Logo Agencia -->
-            <div class="cud-logo-agencia">
-              <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
-                <circle cx="18" cy="18" r="16" stroke="#29b5e8" stroke-width="2.5" fill="none"/>
-                <path d="M18 8 C12 8 8 13 8 18 C8 23 12 28 18 28" stroke="#29b5e8" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-                <path d="M18 8 C24 8 28 13 28 18 C28 23 24 28 18 28" stroke="#29b5e8" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.5"/>
-              </svg>
-              <div>
-                <div class="cud-logo-text-sub">Agencia<br>Nacional de<br>Discapacidad</div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Franja celeste derecha con texto vertical -->
-          <div class="cud-dorso-right">
-            <span>Certificado Único de Discapacidad (CUD) – Dorso</span>
-          </div>
-
-        </div>
-      </div>
+      <img src="img/flor_dorso.png" alt="CUD Dorso"/>
     </div>
   </div>
   <div class="lb-arrow left" onclick="lbPrev()">‹</div>
