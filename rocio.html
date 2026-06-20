@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>miArgentina</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  :root {
+    --blue:#3533C4; --gray-bg:#F2F2F5; --white:#FFFFFF;
+    --text-dark:#1A1A2E; --text-mid:#4A4A6A; --text-light:#8888AA;
+    --card-shadow:0 2px 8px rgba(0,0,0,0.08); --radius:14px;
+  }
+  body { font-family:'Nunito',sans-serif; background:var(--gray-bg); min-height:100vh; overflow-x:hidden; }
+
+  /* ===== SPLASH ===== */
+  #splash {
+    position:fixed; inset:0; background:var(--blue);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    z-index:9999; transition:opacity 0.4s ease, visibility 0.4s ease;
+  }
+  #splash.hide { opacity:0; visibility:hidden; pointer-events:none; }
+  #splash-step1, #splash-step2 { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; transition:opacity 0.5s ease; }
+  #splash-step2 { opacity:0; }
+  #splash.step2 #splash-step1 { opacity:0; }
+  #splash.step2 #splash-step2 { opacity:1; }
+  .splash-mi { font-family:'Nunito',sans-serif; font-size:72px; font-weight:800; color:#fff; letter-spacing:-2px; }
+  .splash-brand { font-size:32px; font-weight:800; color:#fff; letter-spacing:-0.5px; }
+  .splash-brand em { font-style:italic; font-weight:400; color:#90d0f0; }
+
+  /* ===== VIEWS ===== */
+  .view { display:none; min-height:100vh; flex-direction:column; }
+  .view.active { display:flex; }
+
+  /* ===== TOPBAR ===== */
+  .topbar { background:var(--blue); display:flex; align-items:center; padding:14px 16px; position:sticky; top:0; z-index:200; gap:10px; }
+  .topbar-menu { cursor:pointer; display:flex; flex-direction:column; gap:5px; padding:4px 2px; }
+  .topbar-menu span { display:block; width:22px; height:2px; background:#fff; border-radius:2px; }
+  .topbar-brand { flex:1; font-size:22px; font-weight:800; color:#fff; letter-spacing:-0.5px; text-align:center; }
+  .topbar-brand em { font-style:italic; font-weight:400; color:#90d0f0; }
+  .topbar-user-btn { display:flex; align-items:center; gap:4px; cursor:pointer; }
+  .topbar-user-circle { width:34px; height:34px; background:rgba(255,255,255,0.2); border-radius:50%; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+  .topbar-user-circle svg { fill:#fff; }
+  .topbar-user-circle img { width:100%; height:100%; object-fit:cover; }
+  .topbar-chevron { color:#b0b8ff; font-size:12px; }
+  /* docs topbar */
+  .topbar-docs { background:var(--blue); display:flex; align-items:center; padding:14px 16px; position:sticky; top:0; z-index:200; gap:12px; }
+  .topbar-back { cursor:pointer; color:#fff; display:flex; align-items:center; }
+  .topbar-back svg { width:22px; height:22px; stroke:#fff; fill:none; stroke-width:2.5; stroke-linecap:round; }
+  .topbar-docs-title { flex:1; font-size:18px; font-weight:800; color:#fff; }
+  .topbar-refresh { cursor:pointer; }
+  .topbar-refresh svg { width:22px; height:22px; stroke:#fff; fill:none; stroke-width:2; stroke-linecap:round; }
+
+  /* ===== OVERLAY ===== */
+  #overlay { position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:300; opacity:0; visibility:hidden; transition:opacity 0.25s, visibility 0.25s; }
+  #overlay.show { opacity:1; visibility:visible; }
+
+  /* ===== SIDE MENU (hamburger) - NEW STYLE full screen list ===== */
+  #side-menu {
+    position:fixed; top:0; left:0; bottom:0; width:100%;
+    background:var(--white); z-index:400;
+    transform:translateX(-100%); transition:transform 0.28s cubic-bezier(0.4,0,0.2,1);
+    display:flex; flex-direction:column;
+  }
+  #side-menu.open { transform:translateX(0); }
+  .smenu-header {
+    background:var(--blue); padding:16px 16px 20px;
+    display:flex; align-items:flex-start; gap:12px;
+  }
+  .smenu-back { cursor:pointer; color:#fff; padding:4px 0; }
+  .smenu-back svg { width:22px; height:22px; stroke:#fff; fill:none; stroke-width:2.5; stroke-linecap:round; }
+  .smenu-header-info { flex:1; }
+  .smenu-brand { font-size:22px; font-weight:800; color:#fff; }
+  .smenu-brand em { font-style:italic; font-weight:400; color:#90d0f0; }
+  .smenu-avatar {
+    width:60px; height:60px; border-radius:50%;
+    background:rgba(255,255,255,0.25); border:2px solid rgba(255,255,255,0.4);
+    display:flex; align-items:center; justify-content:center; margin:12px 0 4px;
+    overflow:hidden;
+  }
+  .smenu-avatar svg { fill:#fff; width:36px; height:36px; }
+  .smenu-id-label { font-size:11px; color:rgba(255,255,255,0.7); font-weight:600; letter-spacing:0.5px; margin-top:4px; }
+  .smenu-nav { flex:1; overflow-y:auto; padding:4px 0; }
+  .smenu-item {
+    display:flex; align-items:center; gap:16px; padding:15px 20px;
+    cursor:pointer; font-size:15px; font-weight:600; color:var(--text-dark);
+    transition:background 0.12s; border:none; background:none; width:100%;
+    font-family:'Nunito',sans-serif; text-align:left; border-bottom:1px solid #f0f0f5;
+  }
+  .smenu-item:active { background:#f5f5fc; }
+  .smenu-item svg { width:22px; height:22px; stroke:var(--text-mid); fill:none; stroke-width:1.8; flex-shrink:0; }
+  .smenu-item.smenu-danger { color:#e53e3e; }
+  .smenu-item.smenu-danger svg { stroke:#e53e3e; }
+  .smenu-sep { height:8px; background:#f5f5f8; }
+  .smenu-bottom { padding:8px 0 24px; }
+
+  /* ===== HOME ===== */
+  #home-content { flex:1; overflow-y:auto; padding-bottom:80px; }
+  /* Greeting in topbar */
+  .home-greeting-bar {
+    background:var(--blue); padding:0 16px 14px; text-align:center;
+  }
+  .home-greeting-name { font-size:16px; font-weight:700; color:#fff; }
+
+  /* Turno card */
+  .turno-card { margin:12px 16px; background:var(--white); border-radius:var(--radius); padding:16px; display:flex; align-items:center; gap:14px; box-shadow:var(--card-shadow); }
+  .turno-icon { width:52px; height:52px; border-radius:12px; border:2px solid var(--blue); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .turno-icon svg { width:30px; height:30px; stroke:var(--blue); fill:none; stroke-width:1.8; }
+  .turno-info { flex:1; }
+  .turno-info p { font-size:14px; color:var(--text-mid); font-weight:600; }
+  .btn-sacar { background:var(--blue); color:#fff; border:none; border-radius:20px; padding:7px 16px; font-size:13px; font-weight:700; cursor:pointer; margin-top:6px; display:inline-block; font-family:'Nunito',sans-serif; }
+
+  /* Credentials card */
+  .creds-card { margin:0 16px 12px; background:#e8f5e9; border-radius:var(--radius); padding:14px 16px; display:flex; align-items:center; gap:12px; }
+  .creds-card-text { flex:1; font-size:15px; font-weight:800; color:#2e7d32; line-height:1.3; }
+  .creds-icon { width:42px; height:42px; flex-shrink:0; }
+  .creds-icon svg { width:42px; height:42px; }
+
+  /* Section title */
+  .section-title { font-size:16px; font-weight:800; color:var(--text-dark); padding:14px 16px 10px; }
+
+  /* Grid cats - 4 columns */
+  .grid-cats { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; padding:0 16px; }
+  .cat-btn { background:var(--white); border:none; border-radius:12px; padding:14px 6px 12px; display:flex; flex-direction:column; align-items:center; gap:7px; cursor:pointer; box-shadow:var(--card-shadow); transition:transform 0.15s; font-family:'Nunito',sans-serif; }
+  .cat-btn:active { transform:scale(0.95); }
+  .cat-btn svg { width:28px; height:28px; stroke:var(--blue); fill:none; stroke-width:1.8; }
+  .cat-btn span { font-size:11px; font-weight:700; color:var(--text-dark); text-align:center; }
+
+  /* Profile card */
+  .profile-card { margin:12px 16px 0; background:#fce4ec; border-radius:var(--radius); padding:14px 16px; display:flex; align-items:center; gap:14px; }
+  .profile-avatar-wrap { position:relative; width:50px; height:50px; flex-shrink:0; }
+  .profile-avatar { width:50px; height:50px; border-radius:50%; background:#e0a0b0; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+  .profile-avatar svg { fill:#c2185b; width:30px; height:30px; }
+  .profile-progress { position:absolute; inset:-3px; border-radius:50%; background:conic-gradient(#e91e63 70%, #f8bbd0 70%); opacity:0.7; }
+  .profile-text { flex:1; }
+  .profile-text strong { font-size:15px; font-weight:800; color:#880e4f; display:block; }
+  .profile-text span { font-size:12px; color:#ad1457; }
+
+  /* BOTTOM NAV */
+  .bottom-nav {
+    position:fixed; bottom:0; left:0; right:0; height:60px;
+    background:var(--white); border-top:1px solid #e8e8f0;
+    display:flex; z-index:150;
+  }
+  .bnav-item { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; cursor:pointer; border:none; background:none; font-family:'Nunito',sans-serif; }
+  .bnav-item svg { width:22px; height:22px; stroke:var(--text-light); fill:none; stroke-width:1.8; }
+  .bnav-item span { font-size:10px; font-weight:700; color:var(--text-light); }
+  .bnav-item.active svg { stroke:var(--blue); }
+  .bnav-item.active span { color:var(--blue); }
+
+  /* ===== DOCS ===== */
+  #docs-content { flex:1; overflow-y:auto; padding:12px 16px 80px; background:var(--gray-bg); }
+  .doc-accordion { background:var(--white); border-radius:var(--radius); box-shadow:var(--card-shadow); overflow:hidden; margin-bottom:10px; }
+  .doc-header { display:flex; align-items:center; gap:12px; padding:16px 18px; cursor:pointer; }
+  .doc-header-icon { width:44px; height:32px; border:2px solid var(--blue); border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .doc-header-icon svg { width:22px; height:22px; stroke:var(--blue); fill:none; stroke-width:1.8; }
+  .doc-header-name { flex:1; font-size:14px; font-weight:700; color:var(--text-dark); line-height:1.4; }
+  .doc-chevron { color:var(--text-light); font-size:18px; transition:transform 0.25s; }
+  .doc-accordion.open .doc-chevron { transform:rotate(180deg); }
+  .doc-body { display:none; border-top:1px solid #f0f0f5; }
+  .doc-accordion.open .doc-body { display:block; }
+  /* DNI accordion body */
+  .dni-body { padding:14px 16px; display:flex; flex-direction:column; gap:10px; }
+  .btn-ver-dni { background:var(--blue); color:#fff; border:none; border-radius:24px; padding:12px; font-size:15px; font-weight:700; width:100%; cursor:pointer; font-family:'Nunito',sans-serif; }
+  .dni-source { font-size:12px; color:var(--text-light); }
+  .dni-source strong { color:var(--blue); }
+  .dni-info-box { background:#f8f8fc; border-radius:10px; padding:12px 14px; font-size:13px; color:var(--text-mid); line-height:1.5; }
+  .btn-solicitar { background:#fff; color:var(--blue); border:2px solid var(--blue); border-radius:24px; padding:11px; font-size:15px; font-weight:700; width:100%; cursor:pointer; font-family:'Nunito',sans-serif; margin-top:4px; }
+  .dni-device-note { display:flex; align-items:center; gap:8px; font-size:12px; color:var(--blue); cursor:pointer; }
+  .dni-device-note svg { width:18px; height:18px; stroke:var(--blue); fill:none; flex-shrink:0; }
+  /* CUD accordion body */
+  .cud-body { padding:14px 16px; display:flex; flex-direction:column; gap:10px; }
+  .btn-ver-cud { background:var(--blue); color:#fff; border:none; border-radius:24px; padding:12px; font-size:15px; font-weight:700; width:100%; cursor:pointer; font-family:'Nunito',sans-serif; }
+
+  /* ===== LIGHTBOX ===== */
+  #lightbox { position:fixed; inset:0; background:#000; z-index:1000; display:none; flex-direction:column; align-items:center; justify-content:center; overflow:hidden; }
+  #lightbox.active { display:flex; }
+  .lb-close { position:absolute; top:14px; right:14px; color:#fff; font-size:18px; cursor:pointer; width:38px; height:38px; background:rgba(0,0,0,0.5); border-radius:50%; display:flex; align-items:center; justify-content:center; z-index:10; }
+  .lb-counter { position:absolute; top:20px; left:50%; transform:translateX(-50%); color:rgba(255,255,255,0.9); font-size:13px; font-weight:700; z-index:10; background:rgba(0,0,0,0.4); padding:3px 12px; border-radius:20px; }
+  .lb-track { display:flex; width:100vw; height:100vh; transition:transform 0.32s cubic-bezier(0.4,0,0.2,1); }
+  .lb-slide { flex-shrink:0; width:100vw; height:100vh; display:flex; align-items:center; justify-content:center; background:#000; }
+  .lb-slide img { width:100%; height:100%; object-fit:contain; user-select:none; pointer-events:none; }
+  .lb-arrow { position:absolute; top:50%; transform:translateY(-50%); width:40px; height:40px; background:rgba(0,0,0,0.45); border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; color:#fff; font-size:24px; z-index:10; }
+  .lb-arrow.left { left:10px; }
+  .lb-arrow.right { right:10px; }
+  .lb-dots { position:absolute; bottom:20px; left:50%; transform:translateX(-50%); display:flex; gap:7px; }
+  .lb-dot { width:7px; height:7px; border-radius:50%; background:rgba(255,255,255,0.35); transition:background 0.2s, width 0.2s; cursor:pointer; }
+  .lb-dot.active { background:#fff; width:20px; border-radius:4px; }
+
+  /* ===== MI PERFIL VIEW ===== */
+  #perfil-content { flex:1; overflow-y:auto; padding-bottom:80px; background:var(--gray-bg); }
+  .perfil-hero { background:var(--blue); padding:24px 16px 32px; display:flex; flex-direction:column; align-items:center; gap:10px; }
+  .perfil-avatar-wrap { position:relative; width:100px; height:100px; }
+  .perfil-avatar-circle { width:100px; height:100px; border-radius:50%; background:#6668cc; border:3px solid rgba(255,255,255,0.4); display:flex; align-items:center; justify-content:center; overflow:hidden; }
+  .perfil-avatar-circle svg { width:72px; height:72px; fill:#8890d0; }
+  .perfil-camera { position:absolute; bottom:2px; right:2px; width:28px; height:28px; background:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 6px rgba(0,0,0,0.2); }
+  .perfil-camera svg { width:16px; height:16px; stroke:#555; fill:none; stroke-width:1.8; }
+  .perfil-name { font-size:20px; font-weight:800; color:#fff; display:flex; align-items:center; gap:6px; }
+  .perfil-check { width:20px; height:20px; background:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; }
+  .perfil-check svg { width:12px; height:12px; stroke:var(--blue); fill:none; stroke-width:3; stroke-linecap:round; }
+  .perfil-cuil { font-size:14px; color:rgba(255,255,255,0.85); font-weight:600; }
+  .perfil-id { font-size:13px; color:rgba(255,255,255,0.7); font-weight:600; }
+
+  .perfil-section-title { font-size:16px; font-weight:800; color:var(--text-dark); padding:18px 16px 10px; }
+  .perfil-card { background:var(--white); border-radius:var(--radius); margin:0 16px 10px; box-shadow:var(--card-shadow); overflow:hidden; }
+  .perfil-field { padding:14px 16px; border-bottom:1px solid #f0f0f5; display:flex; align-items:flex-start; gap:10px; }
+  .perfil-field:last-child { border-bottom:none; }
+  .perfil-field-info { flex:1; }
+  .perfil-field-label { font-size:12px; color:var(--text-light); font-weight:600; display:flex; align-items:center; gap:6px; margin-bottom:3px; }
+  .perfil-field-value { font-size:15px; font-weight:700; color:var(--text-dark); }
+  .perfil-edit { width:32px; height:32px; display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; margin-top:4px; }
+  .perfil-edit svg { width:18px; height:18px; stroke:var(--blue); fill:none; stroke-width:2; }
+  .badge-verificar { background:#fce4ec; color:#c2185b; font-size:11px; font-weight:700; padding:2px 8px; border-radius:10px; white-space:nowrap; }
+
+  .perfil-datos-grid { background:var(--white); border-radius:var(--radius); margin:0 16px 10px; box-shadow:var(--card-shadow); padding:16px; display:grid; grid-template-columns:1fr 1fr; gap:16px 12px; }
+  .perfil-dato { display:flex; flex-direction:column; gap:2px; }
+  .perfil-dato-label { font-size:12px; color:var(--text-light); font-weight:600; }
+  .perfil-dato-value { font-size:14px; font-weight:700; color:var(--text-dark); }
+
+  /* TOAST */
+  #toast { position:fixed; bottom:80px; left:50%; transform:translateX(-50%); background:#333; color:#fff; padding:10px 20px; border-radius:20px; font-size:13px; font-weight:700; opacity:0; transition:opacity 0.3s; z-index:600; pointer-events:none; white-space:nowrap; }
+</style>
+</head>
+<body>
+
+<!-- SPLASH -->
+<div id="splash">
+  <div id="splash-step1">
+    <div class="splash-mi">mi</div>
+  </div>
+  <div id="splash-step2">
+    <div class="splash-brand"><em>mi</em>Argentina</div>
+  </div>
+</div>
+
+<!-- OVERLAY -->
+<div id="overlay" onclick="closeAll()"></div>
+
+<!-- SIDE MENU (hamburger - full style like foto 4/5) -->
+<div id="side-menu">
+  <div class="smenu-header">
+    <div class="smenu-back" onclick="closeAll()">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+    </div>
+    <div class="smenu-header-info">
+      <div class="smenu-brand"><em>mi</em>Argentina</div>
+      <div class="smenu-avatar">
+        <svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+      </div>
+      <div class="smenu-id-label">Identidad validada</div>
+    </div>
+  </div>
+  <nav class="smenu-nav">
+    <button class="smenu-item" onclick="menuNav('perfil')">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+      Mi perfil
+    </button>
+    <button class="smenu-item" onclick="menuNav('home')">
+      <svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="3"/><circle cx="15" cy="7" r="3"/><path d="M3 21v-2a6 6 0 0 1 6-6h6a6 6 0 0 1 6 6v2"/></svg>
+      Hijos/as asociados
+    </button>
+    <button class="smenu-item" onclick="closeMenuThen()">
+      <svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><circle cx="12" cy="15" r="2"/><path d="M12 8v4"/></svg>
+      Suscribir servicios
+    </button>
+    <div class="smenu-sep"></div>
+    <button class="smenu-item" onclick="closeMenuThen()">
+      <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      Seguridad y privacidad
+    </button>
+    <div class="smenu-sep"></div>
+    <button class="smenu-item" onclick="closeMenuThen()">
+      <svg viewBox="0 0 24 24"><text x="2" y="18" font-size="14" font-weight="800" fill="#4A4A6A" stroke="none">mi</text></svg>
+      Acerca de
+    </button>
+    <button class="smenu-item" onclick="closeMenuThen()">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/></svg>
+      Términos y condiciones
+    </button>
+    <div class="smenu-sep"></div>
+    <div class="smenu-bottom">
+      <button class="smenu-item smenu-danger" onclick="closeMenuThen()">
+        <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Cerrar sesión
+      </button>
+      <button class="smenu-item" onclick="menuNav('home')">
+        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Volver al inicio
+      </button>
+    </div>
+  </nav>
+  <!-- bottom nav inside menu -->
+  <div style="display:flex; border-top:1px solid #eee; padding:8px 0;">
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;" onclick="menuNav('home')">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span style="font-size:10px;font-weight:700;color:var(--blue);">Inicio</span>
+    </div>
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;" onclick="closeMenuThen()">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <span style="font-size:10px;font-weight:700;color:#888;">Novedades</span>
+    </div>
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;" onclick="closeMenuThen()">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="1.8"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.07 9.8"/><path d="M1 1l22 22"/></svg>
+      <span style="font-size:10px;font-weight:700;color:#888;">Teléfonos</span>
+    </div>
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;" onclick="closeMenuThen()">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7"/><path d="M17 17l2 2 4-4"/></svg>
+      <span style="font-size:10px;font-weight:700;color:#888;">Tina</span>
+    </div>
+  </div>
+</div>
+
+<!-- HOME VIEW -->
+<div id="view-home" class="view">
+  <div class="topbar">
+    <div class="topbar-menu" onclick="toggleMenu()"><span></span><span></span><span></span></div>
+    <div class="topbar-brand"><em>mi</em>Argentina</div>
+    <div class="topbar-user-btn" onclick="goTo('perfil')">
+      <div class="topbar-user-circle">
+        <svg width="18" height="18" viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+      </div>
+    </div>
+  </div>
+  <div class="home-greeting-bar">
+    <div class="home-greeting-name">¡Hola, Rocio!</div>
+  </div>
+  <div id="home-content">
+    <!-- Turno card -->
+    <div class="turno-card">
+      <div class="turno-icon">
+        <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M3 10h18M8 10v9M8 5v2"/><text x="10" y="19" font-size="5" font-weight="bold" fill="var(--blue)" stroke="none">001</text></svg>
+      </div>
+      <div class="turno-info">
+        <p>No tenés turnos programados.</p>
+        <button class="btn-sacar">Sacá turno</button>
+      </div>
+    </div>
+    <!-- Credentials card -->
+    <div class="creds-card">
+      <div class="creds-card-text">¡Todas tus credenciales<br>están al día!</div>
+      <div class="creds-icon">
+        <svg viewBox="0 0 48 48" fill="none">
+          <rect x="6" y="10" width="30" height="22" rx="3" stroke="#2e7d32" stroke-width="2" fill="white"/>
+          <circle cx="14" cy="19" r="4" stroke="#2e7d32" stroke-width="1.5" fill="#c8e6c9"/>
+          <line x1="22" y1="17" x2="32" y2="17" stroke="#2e7d32" stroke-width="1.5"/>
+          <line x1="22" y1="21" x2="30" y2="21" stroke="#a5d6a7" stroke-width="1.5"/>
+          <circle cx="34" cy="30" r="8" fill="#43a047"/>
+          <polyline points="29,30 32,33 39,27" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </svg>
+      </div>
+    </div>
+    <!-- Section -->
+    <div class="section-title">¿Qué necesitás hoy?</div>
+    <div class="grid-cats">
+      <button class="cat-btn" onclick="goTo('docs')">
+        <svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><line x1="8" y1="8" x2="16" y2="8"/><line x1="8" y1="12" x2="16" y2="12"/><circle cx="8" cy="8" r="1" fill="var(--blue)" stroke="none"/><circle cx="8" cy="12" r="1" fill="var(--blue)" stroke="none"/></svg>
+        <span>Documentos</span>
+      </button>
+      <button class="cat-btn" onclick="showComingSoon()">
+        <svg viewBox="0 0 24 24"><path d="M5 17H3v-6l2.5-5h11L19 11v6h-2"/><circle cx="7.5" cy="17.5" r="1.5"/><circle cx="16.5" cy="17.5" r="1.5"/><path d="M5 11h14"/></svg>
+        <span>Vehículos</span>
+      </button>
+      <button class="cat-btn" onclick="showComingSoon()">
+        <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
+        <span>Trabajo</span>
+      </button>
+      <button class="cat-btn" onclick="showComingSoon()">
+        <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        <span>Salud</span>
+      </button>
+      <button class="cat-btn" onclick="showComingSoon()">
+        <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/><circle cx="12" cy="15" r="2"/></svg>
+        <span>Cobros</span>
+      </button>
+      <button class="cat-btn" onclick="showComingSoon()">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        <span>Trámites</span>
+      </button>
+      <button class="cat-btn" onclick="showComingSoon()">
+        <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M3 10h18M8 10v9M8 5v2"/></svg>
+        <span>Turnos</span>
+      </button>
+      <button class="cat-btn" onclick="showComingSoon()">
+        <svg viewBox="0 0 24 24"><circle cx="9" cy="7" r="3"/><circle cx="15" cy="7" r="3"/><path d="M3 21v-2a6 6 0 0 1 6-6h6a6 6 0 0 1 6 6v2"/></svg>
+        <span>Hijos</span>
+      </button>
+    </div>
+    <!-- Profile card -->
+    <div class="profile-card">
+      <div class="profile-avatar-wrap">
+        <div class="profile-progress"></div>
+        <div class="profile-avatar">
+          <svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+        </div>
+      </div>
+      <div class="profile-text">
+        <strong>Completá tu perfil</strong>
+        <span>Mantené todos tus datos actualizados</span>
+      </div>
+    </div>
+  </div>
+  <!-- BOTTOM NAV -->
+  <div class="bottom-nav">
+    <button class="bnav-item active" onclick="goTo('home')">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span>Inicio</span>
+    </button>
+    <button class="bnav-item" onclick="showComingSoon()">
+      <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <span>Novedades</span>
+    </button>
+    <button class="bnav-item" onclick="showComingSoon()">
+      <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.07 9.8a19.79 19.79 0 0 1-3-8.68A2 2 0 0 1 3 .18h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.09 7.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 21 14h-.08a2 2 0 0 1 1 1.92z"/></svg>
+      <span>Teléfonos</span>
+    </button>
+    <button class="bnav-item" onclick="showComingSoon()">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7"/><path d="M17 17l2 2 4-4"/></svg>
+      <span>Tina</span>
+    </button>
+  </div>
+</div>
+
+<!-- DOCS VIEW -->
+<div id="view-docs" class="view">
+  <div class="topbar-docs">
+    <div class="topbar-back" onclick="goTo('home')">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+    </div>
+    <div class="topbar-docs-title">Documentos</div>
+    <div class="topbar-refresh">
+      <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+    </div>
+  </div>
+  <div id="docs-content">
+    <!-- DNI accordion -->
+    <div class="doc-accordion" id="acc-dni">
+      <div class="doc-header" onclick="toggleAccordion('acc-dni')">
+        <div class="doc-header-icon">
+          <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="8" cy="12" r="2"/><line x1="13" y1="10" x2="20" y2="10"/><line x1="13" y1="14" x2="18" y2="14"/></svg>
+        </div>
+        <div class="doc-header-name">Documento Nacional de Identidad (DNI)</div>
+        <div class="doc-chevron">⌄</div>
+      </div>
+      <div class="doc-body">
+        <div class="dni-body">
+          <button class="btn-ver-dni" onclick="showComingSoon()">Ver DNI digital</button>
+          <div class="dni-source">Datos suministrados por <strong>RENAPER</strong></div>
+          <div style="height:1px;background:#eee;"></div>
+          <div class="dni-info-box">Recordá que podés solicitar el DNI para vos y para tus hijos y tenerlo disponible en la App.</div>
+          <button class="btn-solicitar" onclick="showComingSoon()">Solicitar DNI Digital</button>
+          <div class="dni-device-note">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Cambie o voy a cambiar el dispositivo
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- CUD accordion -->
+    <div class="doc-accordion" id="acc-cud">
+      <div class="doc-header" onclick="toggleAccordion('acc-cud')">
+        <div class="doc-header-icon" style="border-color:#5B8DD9;">
+          <svg viewBox="0 0 24 24" stroke="#5B8DD9"><text x="2" y="17" font-size="9" font-weight="900" fill="#5B8DD9" stroke="none">CUD</text></svg>
+        </div>
+        <div class="doc-header-name">Certificado Único de Discapacidad (CUD)</div>
+        <div class="doc-chevron">⌄</div>
+      </div>
+      <div class="doc-body">
+        <div class="cud-body">
+          <button class="btn-ver-cud" onclick="openLightbox(0)">Ver CUD digital</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- BOTTOM NAV -->
+  <div class="bottom-nav">
+    <button class="bnav-item active" onclick="goTo('home')">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span>Inicio</span>
+    </button>
+    <button class="bnav-item" onclick="showComingSoon()">
+      <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <span>Novedades</span>
+    </button>
+    <button class="bnav-item" onclick="showComingSoon()">
+      <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.07 9.8a19.79 19.79 0 0 1-3-8.68A2 2 0 0 1 3 .18h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.09 7.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 21 14h-.08a2 2 0 0 1 1 1.92z"/></svg>
+      <span>Teléfonos</span>
+    </button>
+    <button class="bnav-item" onclick="showComingSoon()">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7"/><path d="M17 17l2 2 4-4"/></svg>
+      <span>Tina</span>
+    </button>
+  </div>
+</div>
+
+<!-- MI PERFIL VIEW -->
+<div id="view-perfil" class="view">
+  <div class="topbar-docs">
+    <div class="topbar-back" onclick="goTo('home')">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+    </div>
+    <div class="topbar-docs-title">Mi perfil</div>
+  </div>
+  <div id="perfil-content">
+    <!-- Hero -->
+    <div class="perfil-hero">
+      <div class="perfil-avatar-wrap">
+        <div class="perfil-avatar-circle">
+          <svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+        </div>
+        <div class="perfil-camera">
+          <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        </div>
+      </div>
+      <div class="perfil-name">
+        Rocio CANEPA
+        <div class="perfil-check">
+          <svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg>
+        </div>
+      </div>
+      <div class="perfil-cuil">CUIL: 273437822749</div>
+      <div class="perfil-id">Identidad validada</div>
+    </div>
+
+    <!-- Datos personales -->
+    <div class="perfil-section-title">Mis datos personales</div>
+    <div class="perfil-card">
+      <div class="perfil-field">
+        <div class="perfil-field-info">
+          <div class="perfil-field-label">Correo electrónico</div>
+          <div class="perfil-field-value"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="afcec3cec1ceccc0dcdbce9d9dc6d9cec1efc8c2cec6c381ccc0c2">[email&#160;protected]</a></div>
+        </div>
+        <div class="perfil-edit">
+          <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </div>
+      </div>
+      <div class="perfil-field">
+        <div class="perfil-field-info">
+          <div class="perfil-field-label">
+            Teléfono celular
+            <span class="badge-verificar">Verificá tu número</span>
+          </div>
+          <div class="perfil-field-value">+54-11-69605034</div>
+        </div>
+        <div class="perfil-edit">
+          <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Domicilio -->
+    <div class="perfil-section-title">Domicilio actual</div>
+    <div class="perfil-card">
+      <div class="perfil-field">
+        <div class="perfil-field-info">
+          <div class="perfil-field-value" style="font-size:16px;">Modesto lafuente 2068</div>
+          <div style="font-size:13px;color:var(--text-mid);margin-top:3px;font-weight:600;">Merlo, Buenos Aires (1716) Argentina</div>
+        </div>
+        <div class="perfil-edit">
+          <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tus datos -->
+    <div class="perfil-section-title">Tus datos</div>
+    <div class="perfil-datos-grid">
+      <div class="perfil-dato">
+        <div class="perfil-dato-label">Nombre</div>
+        <div class="perfil-dato-value">Rocio</div>
+      </div>
+      <div class="perfil-dato">
+        <div class="perfil-dato-label">Apellido</div>
+        <div class="perfil-dato-value">VALLE</div>
+      </div>
+      <div class="perfil-dato">
+        <div class="perfil-dato-label">DNI</div>
+        <div class="perfil-dato-value">43782274</div>
+      </div>
+      <div class="perfil-dato">
+        <div class="perfil-dato-label">Sexo</div>
+        <div class="perfil-dato-value">Femenino</div>
+      </div>
+      <div class="perfil-dato">
+        <div class="perfil-dato-label">Fecha de nacimiento</div>
+        <div class="perfil-dato-value">03/07/1999</div>
+      </div>
+      <div class="perfil-dato">
+        <div class="perfil-dato-label">Nacionalidad</div>
+        <div class="perfil-dato-value">Argentina</div>
+      </div>
+    </div>
+    <div style="height:20px;"></div>
+  </div>
+  <!-- BOTTOM NAV -->
+  <div class="bottom-nav">
+    <button class="bnav-item active" onclick="goTo('home')">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span>Inicio</span>
+    </button>
+    <button class="bnav-item" onclick="showComingSoon()">
+      <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <span>Novedades</span>
+    </button>
+    <button class="bnav-item" onclick="showComingSoon()">
+      <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.07 9.8a19.79 19.79 0 0 1-3-8.68A2 2 0 0 1 3 .18h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.09 7.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 21 14h-.08a2 2 0 0 1 1 1.92z"/></svg>
+      <span>Teléfonos</span>
+    </button>
+    <button class="bnav-item" onclick="showComingSoon()">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7"/><path d="M17 17l2 2 4-4"/></svg>
+      <span>Tina</span>
+    </button>
+  </div>
+</div>
+
+<!-- LIGHTBOX -->
+<div id="lightbox">
+  <div class="lb-counter" id="lb-counter">1 / 2</div>
+  <div class="lb-close" onclick="closeLightbox()">✕</div>
+  <div class="lb-track" id="lb-track">
+    <div class="lb-slide">
+      <img src="img/flor_frente.png" alt="CUD Frente"/>
+    </div>
+    <div class="lb-slide">
+      <img src="img/flor_dorso.png" alt="CUD Dorso"/>
+    </div>
+  </div>
+  <div class="lb-arrow left" onclick="lbPrev()">‹</div>
+  <div class="lb-arrow right" onclick="lbNext()">›</div>
+  <div class="lb-dots" id="lb-dots"></div>
+</div>
+
+<!-- TOAST -->
+<div id="toast">Próximamente disponible</div>
+
+<script>
+// ===== SPLASH =====
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    document.getElementById('splash').classList.add('step2');
+    setTimeout(() => {
+      document.getElementById('splash').classList.add('hide');
+      goTo('home');
+    }, 1000);
+  }, 1000);
+});
+
+// ===== NAV =====
+function goTo(view) {
+  closeAll();
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + view).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+// ===== MENU =====
+let menuOpen = false;
+function toggleMenu() {
+  menuOpen = !menuOpen;
+  document.getElementById('side-menu').classList.toggle('open', menuOpen);
+  document.getElementById('overlay').classList.toggle('show', menuOpen);
+}
+function menuNav(view) { closeAll(); goTo(view); }
+function closeMenuThen() { closeAll(); showComingSoon(); }
+function closeAll() {
+  menuOpen = false;
+  document.getElementById('side-menu').classList.remove('open');
+  document.getElementById('overlay').classList.remove('show');
+}
+
+// ===== ACCORDION =====
+function toggleAccordion(id) {
+  const el = document.getElementById(id);
+  el.classList.toggle('open');
+}
+
+// ===== TOAST =====
+function showComingSoon() {
+  const t = document.getElementById('toast');
+  t.style.opacity = '1';
+  setTimeout(() => { t.style.opacity = '0'; }, 2000);
+}
+
+// ===== LIGHTBOX =====
+let lbIndex = 0;
+const lbSlides = 2;
+function buildDots() {
+  const dots = document.getElementById('lb-dots');
+  dots.innerHTML = '';
+  for (let i = 0; i < lbSlides; i++) {
+    const d = document.createElement('div');
+    d.className = 'lb-dot' + (i === lbIndex ? ' active' : '');
+    d.onclick = () => lbGoto(i);
+    dots.appendChild(d);
+  }
+}
+function lbUpdate() {
+  document.getElementById('lb-track').style.transform = `translateX(-${lbIndex * 100}vw)`;
+  document.getElementById('lb-counter').textContent = `${lbIndex + 1} / ${lbSlides}`;
+  buildDots();
+}
+function openLightbox(idx) {
+  lbIndex = idx;
+  document.getElementById('lightbox').classList.add('active');
+  lbUpdate();
+}
+function closeLightbox() { document.getElementById('lightbox').classList.remove('active'); }
+function lbGoto(i) { lbIndex = i; lbUpdate(); }
+function lbNext() { if (lbIndex < lbSlides - 1) { lbIndex++; lbUpdate(); } }
+function lbPrev() { if (lbIndex > 0) { lbIndex--; lbUpdate(); } }
+
+let tsX = null, tsY = null;
+const lb = document.getElementById('lightbox');
+lb.addEventListener('touchstart', e => { tsX = e.touches[0].clientX; tsY = e.touches[0].clientY; }, {passive:true});
+lb.addEventListener('touchend', e => {
+  if (tsX === null) return;
+  const dx = e.changedTouches[0].clientX - tsX;
+  const dy = e.changedTouches[0].clientY - tsY;
+  if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40) { if (dx < 0) lbNext(); else lbPrev(); }
+  tsX = null; tsY = null;
+}, {passive:true});
+
+buildDots();
+</script>
+</body>
+</html>
